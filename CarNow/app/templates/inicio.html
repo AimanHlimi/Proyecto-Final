@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>CarNow</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+    }
+
+    nav {
+      background-color: #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      padding: 10px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+      color: #1D2A3A;
+      text-decoration: none;
+    }
+
+    .nav-links a {
+      margin-left: 20px;
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+    }
+
+    .nav-links a:hover {
+      color: #1D2A3A;
+    }
+
+    .layout {
+      display: flex;
+      min-height: calc(100vh - 60px);
+    }
+
+    aside {
+      width: 300px;
+      background: #fff;
+      padding: 20px;
+      border-right: 1px solid #ddd;
+      overflow-y: auto;
+      height: 100vh;
+      position: sticky;
+      top: 60px;
+    }
+
+    aside h3 {
+      margin-top: 0;
+      color: #1D2A3A;
+    }
+
+    aside table {
+      width: 100%;
+      border-spacing: 8px;
+    }
+
+    aside label {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    aside input, aside select {
+      width: 100%;
+      padding: 4px;
+    }
+
+    main {
+      flex: 1;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    .cards {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: flex-start;
+    }
+
+    .card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      width: 300px;
+      overflow: hidden;
+      transition: transform 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+
+    .card-content {
+      padding: 15px;
+    }
+
+    .card-content h3 {
+      margin: 0 0 10px;
+      color: #1D2A3A;
+    }
+
+    .precio {
+      font-size: 18px;
+      color: #1D2A3A;
+      font-weight: bold;
+    }
+
+    .info {
+      font-size: 14px;
+      color: #555;
+    }
+
+    .provincia {
+      font-size: 13px;
+      color: #777;
+      margin-top: 5px;
+    }
+
+    .btn-group {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-group button,
+    .btn-group a {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      border-radius: 4px;
+      text-align: center;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .btn-primary {
+      background-color: #1D2A3A;
+      color: white;
+    }
+
+    .btn-reset {
+      background-color: #ccc;
+      color: black;
+    }
+
+    aside .form-group {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 15px;
+    }
+
+    aside label {
+      font-weight: bold;
+      margin-bottom: 5px;
+      font-size: 14px;
+      color: #1D2A3A;
+    }
+
+    aside input, aside select {
+      padding: 6px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+  </style>
+</head>
+<body>
+
+<!-- Barra de navegación -->
+<nav>
+  <img src="{{ url_for('static', filename='logo.png') }}" alt="CarNow" style="height: 50px;">
+  <div class="nav-links">
+    <a href="/">Inicio</a>
+    <a href="/publicar">Publicar</a>
+    <a href="/perfil">
+      <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
+        <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"></path>
+        <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"></path>
+      </svg>
+    </a>
+  </div>
+</nav>
+
+<!-- Contenido -->
+<div class="layout">
+
+  <!-- Aside: Filtros -->
+  <aside>
+    <form method="get" action="/">
+      <h3>Filtrar vehículos</h3>
+      <div class="form-group">
+        <label for="marca">Marca:</label>
+        <input type="text" name="marca" id="marca" value="{{ request.args.get('marca', '') }}">
+      </div>
+      <div class="form-group">
+        <label for="modelo">Modelo:</label>
+        <input type="text" name="modelo" id="modelo" value="{{ request.args.get('modelo', '') }}">
+      </div>
+      <div class="form-group">
+        <label for="anio_min">Año desde:</label>
+        <input type="number" name="anio_min" id="anio_min" value="{{ request.args.get('anio_min', '') }}">
+      </div>
+      <div class="form-group">
+        <label for="anio_max">Año hasta:</label>
+        <input type="number" name="anio_max" id="anio_max" value="{{ request.args.get('anio_max', '') }}">
+      </div>
+      <div class="form-group">
+        <label for="km_max">Km máximos:</label>
+        <input type="number" name="km_max" id="km_max" value="{{ request.args.get('km_max', '') }}">
+      </div>
+      <div class="form-group">
+        <label for="tipo">Tipo:</label>
+        <select name="tipo" id="tipo">
+          <option value="">Todos</option>
+          <option value="SUV" {% if request.args.get('tipo') == 'SUV' %}selected{% endif %}>SUV</option>
+          <option value="Hatchback" {% if request.args.get('tipo') == 'Hatchback' %}selected{% endif %}>Hatchback</option>
+          <option value="Sedan" {% if request.args.get('tipo') == 'Sedan' %}selected{% endif %}>Sedan</option>
+          <option value="Monovolumen" {% if request.args.get('tipo') == 'Monovolumen' %}selected{% endif %}>Monovolumen</option>
+          <option value="Deportivo" {% if request.args.get('tipo') == 'Deportivo' %}selected{% endif %}>Deportivo</option>
+          <option value="Descapotable" {% if request.args.get('tipo') == 'Descapotable' %}selected{% endif %}>Descapotable</option>
+          <option value="Furgoneta" {% if request.args.get('tipo') == 'Furgoneta' %}selected{% endif %}>Furgoneta</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="combustible">Combustible:</label>
+        <select name="combustible" id="combustible">
+          <option value="">Todos</option>
+          <option value="Gasolina" {% if request.args.get('combustible') == 'Gasolina' %}selected{% endif %}>Gasolina</option>
+          <option value="Diesel" {% if request.args.get('combustible') == 'Diesel' %}selected{% endif %}>Diesel</option>
+          <option value="Electrico" {% if request.args.get('combustible') == 'Electrico' %}selected{% endif %}>Electrico</option>
+          <option value="Hibrido" {% if request.args.get('combustible') == 'Hibrido' %}selected{% endif %}>Hibrido</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="transmision">Transmisión:</label>
+        <select name="transmision" id="transmision">
+          <option value="">Todas</option>
+          <option value="Manual" {% if request.args.get('transmision') == 'Manual' %}selected{% endif %}>Manual</option>
+          <option value="Automático" {% if request.args.get('transmision') == 'Automático' %}selected{% endif %}>Automático</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="provincia">Provincia:</label>
+        <input type="text" name="provincia" id="provincia" value="{{ request.args.get('provincia', '') }}">
+      </div>
+      <div class="form-group">
+        <label for="precio_max">Precio máximo:</label>
+        <input type="number" name="precio_max" id="precio_max" value="{{ request.args.get('precio_max', '') }}">
+      </div>
+    
+      <div class="btn-group">
+        <button type="submit" class="btn-primary">Aplicar</button>
+        <a href="/" class="btn-reset">Reset</a>
+      </div>
+    </form>
+  </aside>
+
+
+  <!-- Main: Vehículos -->
+  <main>
+    <div class="cards">
+      {% for vehiculo in vehiculos %}
+        <div class="card">
+          <img src="{{ url_for('static', filename=vehiculo.imagen) }}" alt="{{ vehiculo.marca }} {{ vehiculo.modelo }}">
+          <div class="card-content">
+            <h3>{{ vehiculo.marca }} {{ vehiculo.modelo }}</h3>
+            <div class="precio">{{ vehiculo.precio }} €</div>
+            <div class="info">{{ vehiculo.anio }} · {{ vehiculo.kilometraje }} km · {{ vehiculo.tipo }} · {{ vehiculo.transmision }}</div>
+            <div class="provincia">📍 {{ vehiculo.provincia }}</div>
+            <div style="margin-top: 10px;">
+              <a href="{{ url_for('detalle', matricula=vehiculo.matricula) }}">
+                <button type="button" class="btn-primary" style="width: 100%;">Ver</button>
+              </a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </main>
+
+</div>
+</body>
+</html>

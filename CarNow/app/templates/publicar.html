@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="">
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f9f9f9;
+          }
+      
+          /* Barra de navegación */
+          nav {
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 10px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+      
+          .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1D2A3A;
+            text-decoration: none;
+          }
+      
+          .nav-links a {
+            margin-left: 20px;
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s;
+          }
+      
+          .nav-links a:hover {
+            color: #1D2A3A;
+          }
+      
+          .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 20px;
+            justify-content: center;
+          }
+      
+          .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            width: 300px;
+            overflow: hidden;
+            transition: transform 0.3s;
+          }
+      
+          .card:hover {
+            transform: translateY(-5px);
+          }
+      
+          .card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+          }
+      
+          .card-content {
+            padding: 15px;
+          }
+      
+          .card-content h3 {
+            margin: 0 0 10px;
+            color: #1D2A3A;
+          }
+      
+          .precio {
+            font-size: 18px;
+            color: #1D2A3A;
+            font-weight: bold;
+          }
+      
+          .info {
+            font-size: 14px;
+            color: #555;
+          }
+      
+          .provincia {
+            font-size: 13px;
+            color: #777;
+            margin-top: 5px;
+          }
+        </style>
+    </head>
+    <body>
+        <!-- Barra de navegación -->
+        <nav>
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="CarNow" style="height: 50px;">
+            <div class="nav-links">
+                <a href="/">Inicio</a>
+                <a href="/publicar">Publicar</a>
+                <a href="/login">Perfil</a>
+            </div>
+        </nav>
+
+        <div class="inicioSesion">
+
+           <!--FORMULARIO--> 
+            <form method="post" enctype="multipart/form-data">
+                <table>
+                    <th colspan="2">Publicar Vehiculo</th>
+                    <tr>
+                        <td><label for="matricula">Matricula:</label></td>
+                        <td><input type="text" name="matricula" required></td>
+                    </tr>
+
+                    <tr>
+                        <td><label for="marca">Marca:</label></td>
+                        <td><input type="text" name="marca" required></td>
+                    </tr>
+
+                    <tr>
+                        <td><label for="modelo">Modelo:</label></td>
+                        <td><input type="text" name="modelo" required></td>
+                    </tr>
+                    <tr>
+                        <td><label for="anio">Año:</label></td>
+                        <td><input type="number" name="anio" required></td>
+                    </tr>
+                    <tr>
+                        <td><label for="potencia">Potencia</label></td>
+                        <td><input type="number" name="potencia" required></td>
+                    </tr>
+                    <tr>
+                        <td><label for="transmision">Transmisión:</label></td>
+                        <td>
+                            <select name="transmision" id="transmision" required>
+                                <option value="">-- Selecciona una opción --</option>
+                                <option value="Manual">Manual</option>
+                                <option value="Automático">Automático</option>
+                            </select>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td><label for="tipo">Tipo:</label></td>
+                        <td>
+                            <select name="tipo" id="tipo" required>
+                                <option value="">-- Selecciona una opción --</option>
+                                <option value="Sedan">Sedan</option>
+                                <option value="SUV">SUV</option>
+                                <option value="Monovolumen">Monovolumen</option>
+                                <option value="Hatchback">Hatchback</option>
+                                <option value="Furgoneta">Furgoneta</option>
+                                <option value="Deportivo">Deportivo</option>
+                                <option value="Descapotable">Descapotable</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label for="combustible">Combustion:</label></td>
+                        <td>
+                          <select name="combustible" id="combustible" required>
+                            <option value="">-- Selecciona una opción --</option>
+                            <option value="Gasolina">Gasolina</option>
+                            <option value="Diesel">Diesel</option>
+                            <option value="Electrico">Electrico</option>
+                            <option value="Hibrido">Hibrido</option>
+                          </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label for="provincia">Provincia:</label></td>
+                        <td><input type="text" name="provincia" required></td>
+                    </tr>
+                    <tr>
+                        <td><label for="kilometraje">Kilometraje:</label></td>
+                        <td><input type="text" name="kilometraje" required></td>
+                    </tr>
+                    <tr>
+                        <td><label for="precio">Precio:</label></td>
+                        <td><input type="text" name="precio" required></td>
+                    </tr>
+                    <tr>
+                        <td><label for="descripcion">Descripcion:</label></td>
+                        <td><input type="text" name="descripcion"></td>
+                    </tr>
+                    <tr>
+                        <td><label for="imagen">Imagen:</label></td>
+                        <td><input type="file" name="imagen" accept="image/*" required></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="acceder">
+                            <button type="submit">Publicar</button>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,51 @@
+services:
+  flask-app:
+    build: .
+    container_name: flask_app
+    ports:
+      - "5000:5000" 
+    volumes:
+      - .:/app  # Montar el directorio de la aplicación en el contenedor
+    environment:
+      - FLASK_APP=app/app.py  
+      - FLASK_ENV=development  # Activar el entorno de desarrollo
+      - MYSQL_HOST=mysql-db  
+      - MYSQL_USER=root  # Usuario de la base de datos
+      - MYSQL_PASSWORD=rootpassword  # Contraseña de la base de datos
+      - MYSQL_DATABASE=carnow  # Nombre de la base de datos
+    depends_on:
+      - mysql-db  # Asegura que mysql-db esté disponible antes de iniciar flask-app
+    networks:
+      - app-network  # Conexión a una red personalizada para la comunicación entre contenedores
+  
+  mysql-db:
+    image: mysql:8.0
+    container_name: mysql_db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword  # Contraseña de mi Base de Datos
+      MYSQL_DATABASE: carnow  # Nombre de la base de datos 
+    volumes:
+      - mysql-data:/var/lib/mysql  # Persistencia de datos
+    ports:
+      - "3306:3306"  # Exponer el puerto 3306 para la conexión con MySQL
+    networks:
+      - app-network  # Conexión a la red personalizada
+  
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    ports:
+      - "80:80"  # Exponer el puerto 80 para acceder a la app a través de Nginx
+    volumes:
+      - ./app:/app  # Montar la carpeta de la app en el contenedor
+    depends_on:
+      - flask-app  # Asegura que flask-app esté disponible antes de iniciar Nginx
+    networks:
+      - app-network  # Conexión a la red personalizada
+
+volumes:
+  mysql-data:  # Volumen para persistir los datos de MySQL
+
+networks:
+  app-network:  # Red personalizada para la comunicación entre los servicios
+    driver: bridge

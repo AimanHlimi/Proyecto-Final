@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Perfil | CarNow</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+    }
+
+    nav {
+      background-color: #fff;
+      padding: 10px 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .nav-links a {
+      margin-left: 20px;
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+    }
+
+    .nav-links a:hover {
+      color: #1D2A3A;
+    }
+
+    .layout {
+      display: flex;
+      min-height: calc(100vh - 60px);
+    }
+
+    aside {
+      width: 250px;
+      background: #fff;
+      padding: 20px;
+      border-right: 1px solid #ddd;
+      position: sticky;
+      top: 60px;
+      height: 100vh;
+    }
+
+    aside h3 {
+      margin-top: 0;
+      color: #1D2A3A;
+    }
+
+    .sidebar-links a {
+      display: block;
+      padding: 10px 0;
+      color: #333;
+      text-decoration: none;
+      font-weight: bold;
+      border-bottom: 1px solid #eee;
+    }
+
+    .sidebar-links a:hover {
+      color: #1D2A3A;
+    }
+
+    main {
+      flex: 1;
+      padding: 30px;
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      width: 300px;
+      margin: 10px;
+      overflow: hidden;
+      display: inline-block;
+      vertical-align: top;
+    }
+
+    .card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+
+    .card-content {
+      padding: 15px;
+    }
+
+    .card-content h4 {
+      margin: 0;
+      color: #1D2A3A;
+    }
+
+    .card-content p {
+      font-size: 14px;
+      color: #555;
+    }
+
+    form input, form select {
+      display: block;
+      margin-bottom: 10px;
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      background-color: #1D2A3A;
+      color: white;
+      border: none;
+      padding: 10px;
+      width: 100%;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+  </style>
+
+  <script>
+    function showSection(id) {
+      document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+    window.onload = () => showSection('mis-coches');
+  </script>
+</head>
+<body>
+
+<!-- Barra de navegación -->
+<nav>
+  <img src="{{ url_for('static', filename='logo.png') }}" alt="CarNow" style="height: 50px;">
+  <div class="nav-links">
+    <a href="/">Inicio</a>
+    <a href="/publicar">Publicar</a>
+    <a href="/logout">Cerrar sesión</a>
+  </div>
+</nav>
+
+<!-- Layout principal -->
+<div class="layout">
+
+  <!-- Menú lateral -->
+  <aside>
+    <h3>Mi Perfil</h3>
+    <div class="sidebar-links">
+      <a href="#" onclick="showSection('mis-coches')">Mis coches</a>
+      <a href="#" onclick="showSection('coches-vendidos')">Coches vendidos</a>
+      <a href="#" onclick="showSection('coches-comprados')">Coches comprados</a>
+      <a href="#" onclick="showSection('editar-perfil')">Editar perfil</a>
+    </div>
+  </aside>
+
+  <!-- Contenido dinámico -->
+  <main>
+    <!-- Mis coches -->
+    <div id="mis-coches" class="section active">
+      <h2>Mis coches en venta</h2>
+      {% for coche in coches_usuario %}
+      <div class="card">
+        <img src="{{ url_for('static', filename=coche.imagen) }}" alt="{{ coche.modelo }}">
+        <div class="card-content">
+          <h4>{{ coche.marca }} {{ coche.modelo }}</h4>
+          <p>{{ coche.anio }} - {{ coche.kilometraje }} km</p>
+          <p>{{ coche.precio }} €</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Coches vendidos -->
+    <div id="coches-vendidos" class="section">
+      <h2>Coches vendidos</h2>
+      {% for coche in coches_vendidos %}
+      <div class="card">
+        <img src="{{ url_for('static', filename=coche.imagen) }}" alt="{{ coche.modelo }}">
+        <div class="card-content">
+          <h4>{{ coche.marca }} {{ coche.modelo }}</h4>
+          <p>Vendido por {{ coche.precio }} €</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Coches comprados -->
+    <div id="coches-comprados" class="section">
+      <h2>Coches comprados</h2>
+      {% for coche in coches_comprados %}
+      <div class="card">
+        <img src="{{ url_for('static', filename=coche.imagen) }}" alt="{{ coche.modelo }}">
+        <div class="card-content">
+          <h4>{{ coche.marca }} {{ coche.modelo }}</h4>
+          <p>Comprado por {{ coche.precio }} €</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Editar perfil -->
+    <div id="editar-perfil" class="section">
+      <h2>Editar mis datos</h2>
+      <form method="post" action="/actualizar_perfil">
+        <label for="nombre">Nombre</label>
+        <input type="text" name="nombre"  value="{{ usuario.nombre }}">
+
+        <label for="apellido">Apellido</label>
+        <input type="text" name="apellido"  value="{{ usuario.apellido }}">
+
+        <label for="email">Correo electrónico</label>
+        <input type="email" name="email" value="{{ usuario.email }}">
+
+        <label for="telefono">Teléfono</label>
+        <input type="text" name="telefono" value="{{ usuario.telefono }}">
+
+        <label for="direccion">Direccion</label>
+        <input type="text" name="direccion" value="{{ usuario.direccion }}">
+
+        
+        <button type="submit">Guardar cambios</button>
+      </form>
+    </div>
+
+  </main>
+</div>
+</body>
+</html>
