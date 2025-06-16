@@ -44,6 +44,13 @@ def login():
 
     return render_template('inicioSesion.html')
 
+@app.route('/logout')
+def logout():
+    session.pop('usuario', None)
+    session.pop('rol', None)
+    flash('Has cerrado sesión correctamente', 'success')
+    return redirect(url_for('login')) 
+
 @app.route('/')
 def mostrar_vehiculos():
     conn = get_db_connection()
@@ -267,6 +274,155 @@ def detalle(matricula):
         return "Vehículo no encontrado", 404
 
 
+@app.route('/editar/<matricula>', methods=['GET', 'POST'])
+def editar_vehiculo(matricula):
+    if 'dni' not in session:
+        flash('Debes iniciar sesión para editar un vehículo.', 'warning')
+        return redirect(url_for('login'))
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    # Obtener ID del usuario
+    cursor.execute("SELECT id_usuario FROM usuarios WHERE dni = %s", (session['dni'],))
+    usuario = cursor.fetchone()
+
+    # Verificar que el vehículo pertenece al usuario
+    cursor.execute("SELECT * FROM vehiculos WHERE matricula = %s AND id_vendedor = %s", (matricula, usuario['id_usuario']))
+    vehiculo = cursor.fetchone()
+
+    if not vehiculo:
+        flash('No tienes permiso para editar este vehículo.', 'danger')
+        return redirect(url_for('mostrar_vehiculos'))
+
+    if request.method == 'POST':
+        matricula = request.form['matricula']
+        
+        cursor.execute("SELECT * FROM vehiculos WHERE matricula = %s", (matricula,))
+        vehiculo = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+    return render_template('editar.html', vehiculo=vehiculo)
+
+@app.route('/actualizar', methods=['GET', 'POST'])
+def actualizar_vehiculo():
+    if request.method:
+        matricula = request.form['matricula']
+        marca = request.form['marca']
+        modelo = request.form['modelo']
+        potencia = request.form['potencia']
+        anio = request.form['anio']
+        transmision = request.form['transmision']
+        tipo = request.form['tipo']
+        combustible = request.form['combustible']
+        provincia = request.form['provincia']
+        kilometraje = request.form['kilometraje']
+        precio = request.form['precio']
+        descripcion = request.form['descripcion']
+            
+            
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute('''UPDATE vehiculos
+            SET matricula = %s, marca = %s, modelo = %s, potencia = %s, anio = %s, 
+            transmision = %s, tipo = %s, combustible = %s, provincia = %s, kilometraje = %s, precio = %s, 
+            descripcion = %s
+            WHERE matricula = %s
+            ''', (matricula, marca, modelo, potencia, anio, transmision, tipo, combustible, 
+                  provincia, kilometraje, precio, descripcion, matricula))
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        flash('Datos actualizados correctamente.', 'success')
+        return redirect(url_for('perfil'))
+    
+@app.route('/comprar', methods=['POST'])
+def comprar_vehiculo():
+    if 'dni' not in session:
+        flash('Debes iniciar sesión para comprar.', 'warning')
+        return redirect(url_for('login'))
+
+    matricula = request.form['matricula']
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    # Obtener ID del comprador
+    cursor.execute("SELECT id_usuario FROM usuarios WHERE dni = %s", (session['dni'],))
+    comprador = cursor.fetchone()
+
+    # Obtener datos del vehículo
+    cursor.execute("SELECT * FROM vehiculos WHERE matricula = %s", (matricula,))
+    vehiculo = cursor.fetchone()
+
+    if not vehiculo:
+        flash('Vehículo no encontrado.', 'danger')
+        return redirect(url_for('mostrar_vehiculos'))
+
+    # Insertar en compras
+    cursor.execute("""
+        INSERT INTO compras (id_comprador, id_vehiculo, precio_final)
+        VALUES (%s, %s, %s)
+    """, (comprador['id_usuario'], matricula, vehiculo['precio']))
+
+    # Insertar en ventas
+    cursor.execute("""
+        INSERT INTO ventas (id_vendedor, id_vehiculo, precio_venta)
+        VALUES (%s, %s, %s)
+    """, (vehiculo['id_vendedor'], matricula, vehiculo['precio']))
+
+    # (Opcional) Marcar el coche como vendido
+    cursor.execute("UPDATE vehiculos SET estado = 'VENDIDO' WHERE matricula = %s", (matricula,))
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    flash('¡Has comprado el vehículo con éxito!', 'success')
+    return redirect(url_for('perfil'))
+
+
+@app.route('/registro', methods=['GET', 'POST'])
+def registro():
+    if request.method == 'POST':
+        dni = request.form['dni']
+        nombre = request.form['nombre']
+        apellido = request.form['apellido']
+        email = request.form['email']
+        usuario = request.form['usuario']
+        contrasena = request.form['contrasena']
+        telefono = request.form['telefono']
+        direccion = request.form['direccion']
+
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        # Comprobar si el usuario, email, dni o teléfono ya existen
+        cursor.execute("SELECT * FROM usuarios WHERE usuario = %s OR email = %s OR dni = %s OR telefono = %s",
+                       (usuario, email, dni, telefono))
+        existente = cursor.fetchone()
+        if existente:
+            flash("Ya existe un usuario con ese DNI, email, teléfono o nombre de usuario.")
+            return redirect(url_for('registro'))
+
+        # Insertar nuevo usuario
+        cursor.execute("""
+            INSERT INTO usuarios (dni, nombre, apellido, email, usuario, contrasena, telefono, direccion)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        """, (dni, nombre, apellido, email, usuario, contrasena, telefono, direccion))
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        flash('Registro exitoso. Ya puedes iniciar sesión.')
+        return redirect(url_for('login'))
+
+    return render_template('registrarse.html')
 
 
 if __name__ == "__main__":

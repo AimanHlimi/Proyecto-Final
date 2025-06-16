@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registro - CarNow</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: #f4f4f4;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .register-box {
+      background: white;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 450px;
+      text-align: center;
+    }
+
+    .register-box h2 {
+      margin-bottom: 25px;
+      color: #333;
+    }
+
+    .register-box form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .register-box input[type="text"],
+    .register-box input[type="email"],
+    .register-box input[type="password"],
+    .register-box input[type="tel"],
+    .register-box textarea {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .register-box button {
+      background-color: #1D2A3A;
+      color: white;
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-top: 10px;
+    }
+
+    .register-box button:hover {
+      background-color: #162230;
+    }
+
+    .register-box a {
+      text-decoration: none;
+      color: #1D2A3A;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    .flash-message {
+      margin-top: 15px;
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="register-box">
+    <h2>Crear cuenta</h2>
+    <form method="post">
+      <input type="text" name="dni" placeholder="DNI" required>
+      <input type="text" name="nombre" placeholder="Nombre" required>
+      <input type="text" name="apellido" placeholder="Apellido" required>
+      <input type="email" name="email" placeholder="Correo electrónico" required>
+      <input type="text" name="usuario" placeholder="Nombre de usuario" required>
+      <input type="password" name="contrasena" placeholder="Contraseña" required>
+      <input type="tel" name="telefono" placeholder="Teléfono" required>
+      <textarea name="direccion" placeholder="Dirección" rows="2" required></textarea>
+      <button type="submit">Registrarse</button>
+      <a href="/login">Ya tengo cuenta</a>
+
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div class="flash-message">{{ messages[0] }}</div>
+        {% endif %}
+      {% endwith %}
+    </form>
+  </div>
+
+</body>
+</html>

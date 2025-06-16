@@ -170,16 +170,21 @@
     <div id="mis-coches" class="section active">
       <h2>Mis coches en venta</h2>
       {% for coche in coches_usuario %}
-      <div class="card">
-        <img src="{{ url_for('static', filename=coche.imagen) }}" alt="{{ coche.modelo }}">
-        <div class="card-content">
-          <h4>{{ coche.marca }} {{ coche.modelo }}</h4>
-          <p>{{ coche.anio }} - {{ coche.kilometraje }} km</p>
-          <p>{{ coche.precio }} €</p>
-        </div>
-      </div>
+        <form method="post" action="{{ url_for('editar_vehiculo', matricula=coche.matricula) }}">
+          <div class="card">
+            <input type="hidden" name="matricula" value="{{ coche.matricula }}">
+            <img src="{{ url_for('static', filename=coche.imagen) }}" alt="{{ coche.modelo }}">
+            <div class="card-content">
+              <h4>{{ coche.marca }} {{ coche.modelo }}</h4>
+              <p>{{ coche.anio }} - {{ coche.kilometraje }} km</p>
+              <p>{{ coche.precio }} €</p>
+              <button type="submit">Editar</button>
+            </div>
+          </div>
+        </form>
       {% endfor %}
     </div>
+
 
     <!-- Coches vendidos -->
     <div id="coches-vendidos" class="section">

@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Publicar Vehículo - CarNow</title>
+  <title>Editar Vehículo - CarNow</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
@@ -74,7 +74,6 @@
 
     input[type="text"],
     input[type="number"],
-    input[type="file"],
     select {
       width: 100%;
       padding: 8px;
@@ -102,13 +101,6 @@
     button[type="submit"]:hover {
       background-color: #162230;
     }
-
-    @media (max-width: 600px) {
-      td {
-        display: block;
-        width: 100%;
-      }
-    }
   </style>
 </head>
 <body>
@@ -123,23 +115,22 @@
   </div>
 </nav>
 
-<!-- Formulario de publicación -->
+<!-- Formulario de edición -->
 <div class="form-container">
-  <h2>Publicar Vehículo</h2>
-  <form method="post" enctype="multipart/form-data">
+  <h2>Editar Vehículo: {{ vehiculo.matricula }}</h2>
+  <form action="{{ url_for('actualizar_vehiculo') }}" method="POST" enctype="multipart/form-data">
     <table>
-      <tr><td><label for="matricula">Matrícula:</label></td><td><input type="text" name="matricula" required></td></tr>
-      <tr><td><label for="marca">Marca:</label></td><td><input type="text" name="marca" required></td></tr>
-      <tr><td><label for="modelo">Modelo:</label></td><td><input type="text" name="modelo" required></td></tr>
-      <tr><td><label for="anio">Año:</label></td><td><input type="number" name="anio" required></td></tr>
-      <tr><td><label for="potencia">Potencia (CV):</label></td><td><input type="number" name="potencia" required></td></tr>
+      <tr><td><input type="hidden" name="matricula" value="{{ vehiculo.matricula }}"></td></tr>
+      <tr><td><label for="marca">Marca:</label></td><td><input type="text" name="marca" value="{{ vehiculo.marca }}" required></td></tr>
+      <tr><td><label for="modelo">Modelo:</label></td><td><input type="text" name="modelo" value="{{ vehiculo.modelo }}" required></td></tr>
+      <tr><td><label for="anio">Año:</label></td><td><input type="number" name="anio" value="{{ vehiculo.anio }}" required></td></tr>
+      <tr><td><label for="potencia">Potencia (CV):</label></td><td><input type="number" name="potencia" value="{{ vehiculo.potencia }}" required></td></tr>
       <tr>
         <td><label for="transmision">Transmisión:</label></td>
         <td>
           <select name="transmision" required>
-            <option value="">-- Selecciona una opción --</option>
-            <option value="Manual">Manual</option>
-            <option value="Automático">Automático</option>
+            <option value="Manual" {% if vehiculo.transmision == 'Manual' %}selected{% endif %}>Manual</option>
+            <option value="Automático" {% if vehiculo.transmision == 'Automático' %}selected{% endif %}>Automático</option>
           </select>
         </td>
       </tr>
@@ -147,14 +138,10 @@
         <td><label for="tipo">Tipo:</label></td>
         <td>
           <select name="tipo" required>
-            <option value="">-- Selecciona una opción --</option>
-            <option value="Sedan">Sedan</option>
-            <option value="SUV">SUV</option>
-            <option value="Monovolumen">Monovolumen</option>
-            <option value="Hatchback">Hatchback</option>
-            <option value="Furgoneta">Furgoneta</option>
-            <option value="Deportivo">Deportivo</option>
-            <option value="Descapotable">Descapotable</option>
+            {% set tipos = ['Sedan', 'SUV', 'Monovolumen', 'Hatchback', 'Furgoneta', 'Deportivo', 'Descapotable'] %}
+            {% for t in tipos %}
+              <option value="{{ t }}" {% if vehiculo.tipo == t %}selected{% endif %}>{{ t }}</option>
+            {% endfor %}
           </select>
         </td>
       </tr>
@@ -162,22 +149,20 @@
         <td><label for="combustible">Combustible:</label></td>
         <td>
           <select name="combustible" required>
-            <option value="">-- Selecciona una opción --</option>
-            <option value="Gasolina">Gasolina</option>
-            <option value="Diesel">Diesel</option>
-            <option value="Electrico">Eléctrico</option>
-            <option value="Hibrido">Híbrido</option>
+            {% set combustibles = ['Gasolina', 'Diesel', 'Electrico', 'Hibrido'] %}
+            {% for c in combustibles %}
+              <option value="{{ c }}" {% if vehiculo.combustible == c %}selected{% endif %}>{{ c }}</option>
+            {% endfor %}
           </select>
         </td>
       </tr>
-      <tr><td><label for="provincia">Provincia:</label></td><td><input type="text" name="provincia" required></td></tr>
-      <tr><td><label for="kilometraje">Kilometraje:</label></td><td><input type="text" name="kilometraje" required></td></tr>
-      <tr><td><label for="precio">Precio:</label></td><td><input type="text" name="precio" required></td></tr>
-      <tr><td><label for="descripcion">Descripción:</label></td><td><input type="text" name="descripcion"></td></tr>
-      <tr><td><label for="imagen">Imagen:</label></td><td><input type="file" name="imagen" accept="image/*" required></td></tr>
+      <tr><td><label for="provincia">Provincia:</label></td><td><input type="text" name="provincia" value="{{ vehiculo.provincia }}" required></td></tr>
+      <tr><td><label for="kilometraje">Kilometraje:</label></td><td><input type="text" name="kilometraje" value="{{ vehiculo.kilometraje }}" required></td></tr>
+      <tr><td><label for="precio">Precio:</label></td><td><input type="text" name="precio" value="{{ vehiculo.precio }}" required></td></tr>
+      <tr><td><label for="descripcion">Descripción:</label></td><td><input type="text" name="descripcion" value="{{ vehiculo.descripcion }}"></td></tr>
       <tr>
         <td colspan="2" class="acceder">
-          <button type="submit">Publicar</button>
+          <button type="submit">Guardar Cambios</button>
         </td>
       </tr>
     </table>
